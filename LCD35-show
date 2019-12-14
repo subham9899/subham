@@ -1,0 +1,31 @@
+#!/bin/bash
+
+sudo ./system_backup.sh
+
+if [ -f /etc/X11/xorg.conf.d/40-libinput.conf ]; then
+sudo rm -rf /etc/X11/xorg.conf.d/40-libinput.conf
+fi
+if [ ! -d /etc/X11/xorg.conf.d ]; then
+sudo mkdir -p /etc/X11/xorg.conf.d
+fi
+sudo cp ./usr/tft35a-overlay.dtb /boot/overlays/
+sudo cp ./usr/tft35a-overlay.dtb /boot/overlays/tft35a.dtbo
+sudo cp -rf ./boot/config-nomal.txt ./boot/config.txt.bak
+sudo echo "hdmi_force_hotplug=1" >> ./boot/config.txt.bak
+sudo echo "dtparam=i2c_arm=on" >> ./boot/config.txt.bak
+sudo echo "dtparam=spi=on" >> ./boot/config.txt.bak
+sudo echo "enable_uart=1" >> ./boot/config.txt.bak
+sudo echo "dtoverlay=tft35a:rotate=90" >> ./boot/config.txt.bak
+sudo cp -rf ./boot/config.txt.bak /boot/config.txt
+
+sudo sync
+sudo sync
+sleep 1
+if [ $# -eq 1 ]; then
+sudo ./rotate.sh $1
+elif [ $# -gt 1 ]; then
+echo "Too many parameters"
+fi
+
+echo "reboot now"
+sudo reboot
